@@ -8,36 +8,58 @@ services:
       -c wal_level=logical
       -c max_wal_senders=10
       -c max_replication_slots=10
+      -c max_connections=100
     environment:
-      POSTGRES_USER: studify
-      POSTGRES_PASSWORD: studify_secret
-      POSTGRES_DB: studify_db
+      POSTGRES_USER: ${POSTGRES_USER:-studify}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-studify_secret}
+      POSTGRES_DB: ${POSTGRES_DB:-studify_db}
     ports:
-      - "5432:5432"
+      - "${POSTGRES_PORT:-5432}:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U studify -d studify_db"]
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER:-studify} -d $${POSTGRES_DB:-studify_db}"]
       interval: 5s
       timeout: 5s
       retries: 5
 
   zero-cache:
-    image: rocicorp/zero-cache:latest
+    image: rocicorp/zero:latest
     container_name: studify-zero-cache
     restart: unless-stopped
     depends_on:
       postgres:
         condition: service_healthy
     environment:
-      ZERO_UPSTREAM_DB: "postgresql://studify:studify_secret@postgres:5432/studify_db"
-      ZERO_CVR_DB: "postgresql://studify:studify_secret@postgres:5432/studify_cvr"
-      ZERO_CHANGE_DB: "postgresql://studify:studify_secret@postgres:5432/studify_change"
-      ZERO_AUTH_SECRET: "studify_super_secret_local_dev_token_at_least_32_chars"
+      ZERO_UPSTREAM_DB: "postgresql://${POSTGRES_USER:-studify}:${POSTGRES_PASSWORD:-studify_secret}@postgres:5432/${POSTGRES_DB:-studify_db}"
+      ZERO_CVR_DB: "postgresql://${POSTGRES_USER:-studify}:${POSTGRES_PASSWORD:-studify_secret}@postgres:5432/${POSTGRES_DB:-studify_db}"
+      ZERO_CHANGE_DB: "postgresql://${POSTGRES_USER:-studify}:${POSTGRES_PASSWORD:-studify_secret}@postgres:5432/${POSTGRES_DB:-studify_db}"
+      ZERO_ADMIN_PASSWORD: "${ZERO_ADMIN_PASSWORD:-studify_admin_secret_123}"
+      ZERO_NUM_SYNC_WORKERS: "1"
+      ZERO_UPSTREAM_MAX_CONNS: "30"
+      ZERO_CVR_MAX_CONNS: "30"
       ZERO_REPLICA_FILE: "/tmp/zero-replica.db"
       ZERO_PORT: "4848"
     ports:
-      - "4848:4848"
+      - "${ZERO_PORT:-4848}:4848"
+
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    container_name: studify-pgadmin
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      PGADMIN_DEFAULT_EMAIL: "${PGADMIN_DEFAULT_EMAIL:-admin@studify.com}"
+      PGADMIN_DEFAULT_PASSWORD: "${PGADMIN_DEFAULT_PASSWORD:-admin}"
+      PGADMIN_CONFIG_SERVER_MODE: 'False'
+    ports:
+      - "${PGADMIN_PORT:-5050}:80"
+    volumes:
+      - pgadmin_data:/var/lib/pgadmin
+      - ./pgadmin-servers.json:/pgadmin4/servers.json
 
 volumes:
   postgres_data:
+  pgadmin_data:

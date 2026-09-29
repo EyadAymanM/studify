@@ -1,0 +1,13 @@
+{
+  "Servers": {
+    "1": {
+      "Name": "Studify Postgres",
+      "Group": "Servers",
+      "Host": "postgres",
+      "Port": 5432,
+      "MaintenanceDB": "studify_db",
+      "Username": "studify",
+      "SSLMode": "prefer"
+    }
+  }
+}

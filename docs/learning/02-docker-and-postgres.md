@@ -127,14 +127,54 @@ PostgreSQL records all database mutations (inserts, updates, deletes) in a seque
 
 ---
 
-## 5. Essential Docker CLI Cheat Sheet
+## 5. Browsing the Database with pgAdmin 4
+
+Instead of running raw SQL commands in the terminal, **pgAdmin 4** provides a full-featured web-based GUI for PostgreSQL to visually inspect tables, run queries, view indexes, and monitor database performance.
+
+### Configuration in `docker-compose.yml`:
+```yaml
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    container_name: studify-pgadmin
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@studify.com
+      PGADMIN_DEFAULT_PASSWORD: admin
+      PGADMIN_CONFIG_SERVER_MODE: 'False'
+    ports:
+      - "5050:80"
+    volumes:
+      - pgadmin_data:/var/lib/pgadmin
+      - ./pgadmin-servers.json:/pgadmin4/servers.json
+```
+
+### Accessing pgAdmin:
+1. Open your browser at: **`http://localhost:5050`**
+2. **Login Credentials**:
+   - **Email**: `admin@studify.com`
+   - **Password**: `admin`
+3. **Connecting to the Database**:
+   - We pre-configure `pgadmin-servers.json` so **"Studify Postgres"** is automatically registered.
+   - When prompted for the database password, enter: `studify_secret`
+   - Expand `Servers -> Studify Postgres -> Databases -> studify_db -> Schemas -> public -> Tables` to view:
+     - `notes`
+     - `tags`
+     - `note_tags`
+
+---
+
+## 6. Essential Docker CLI Cheat Sheet
 
 | Command | What It Does |
 | :--- | :--- |
 | `docker compose up -d` | Starts all services in the background (detached mode) |
 | `docker compose ps` | Displays the status and healthcheck results of containers |
-| `docker compose logs -f <service>` | Streams live output logs from a container (e.g. `postgres`) |
+| `docker compose logs -f <service>` | Streams live output logs from a container (e.g. `postgres`, `pgadmin`) |
 | `docker compose stop` | Stops running containers without deleting data |
 | `docker compose down` | Stops and removes containers and internal virtual networks |
 | `docker compose down -v` | ⚠️ Stops containers **and permanently wipes data volumes** |
 | `docker exec -it studify-postgres psql -U studify -d studify_db` | Enters an interactive PostgreSQL SQL shell inside the container |
+

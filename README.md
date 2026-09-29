@@ -46,7 +46,8 @@ Every tool and architectural pattern in Studify is documented with a dedicated e
 5. 📊 [05 — Performance Engineering: Backend Metrics & Frontend Web Vitals](docs/learning/05-performance-metrics.md)
 6. 🎨 [06 — Intentional Frontend Design & Core Web Vitals](docs/learning/06-frontend-design-and-web-vitals.md)
 7. 🧪 [07 — Testing Strategies & GitHub Actions CI/CD](docs/learning/07-testing-and-cicd.md)
-8. 🏛️ [Complete System Architecture & Specifications](docs/architecture.md)
+8. 🌊 [08 — Tailwind CSS v4 Architecture & Modern Utility Styling](docs/learning/08-tailwindcss-v4-architecture.md)
+9. 🏛️ [Complete System Architecture & Specifications](docs/architecture.md)
 
 ---
 
@@ -122,6 +123,13 @@ cd studify-client
 pnpm install
 pnpm dev            # Open http://localhost:5173
 ```
+
+### 4. Browse Database with pgAdmin 4 (Web GUI)
+Open [http://localhost:5050](http://localhost:5050) in your browser:
+- **Email**: `admin@studify.com`
+- **Password**: `admin`
+- **Database Password**: `studify_secret`
+*(Pre-configured to automatically connect to `studify-postgres`)*
 
 ---
 

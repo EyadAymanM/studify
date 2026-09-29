@@ -45,6 +45,11 @@ export function App() {
   // Apply theme to document
   useEffect(() => {
     document.documentElement.setAttribute('data-theme', theme);
+    if (theme === 'dark') {
+      document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+    }
     localStorage.setItem('studify_theme', theme);
   }, [theme]);
 
@@ -61,7 +66,6 @@ export function App() {
         if (data.length > 0) {
           setNotes(data);
         } else {
-          // Provide high-quality starter cards if database is fresh
           setNotes(INITIAL_STARTER_NOTES);
         }
       }
@@ -73,7 +77,6 @@ export function App() {
   }, []);
 
   const handleAddNote = async (input: { content: string; category: NoteCategory; tags: string[] }) => {
-    // Optimistic UI update
     const tempId = `temp-${Date.now()}`;
     const optimisticNote: Note = {
       id: tempId,
@@ -106,7 +109,6 @@ export function App() {
     );
   };
 
-  // Gather all unique tags from notes
   const allTags: Tag[] = useMemo(() => {
     const map = new Map<string, Tag>();
     for (const note of notes) {
@@ -119,7 +121,6 @@ export function App() {
     return Array.from(map.values()).sort((a, b) => a.name.localeCompare(b.name));
   }, [notes]);
 
-  // Filter notes by search & active tags
   const filteredNotes = useMemo(() => {
     return notes.filter((note) => {
       if (activeTags.length > 0) {
@@ -138,10 +139,11 @@ export function App() {
   }, [notes, activeTags, search]);
 
   return (
-    <div className="app-container">
-      <header className="app-header">
-        <a href="/" className="brand-badge" data-testid="brand-logo">
-          <div className="brand-icon">
+    <div className="min-h-screen flex flex-col px-4 pb-20 bg-[radial-gradient(circle_at_50%_0%,var(--accent-glow)_0%,transparent_60%)]">
+      {/* Header */}
+      <header className="max-w-4xl w-full mx-auto py-6 flex items-center justify-between">
+        <a href="/" className="flex items-center gap-3 font-extrabold text-2xl tracking-tight text-[var(--text-main)] no-underline" data-testid="brand-logo">
+          <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-sky-400 to-sky-600 flex items-center justify-center text-white shadow-md shadow-sky-500/20">
             <Cloud size={20} />
           </div>
           <span>Studify</span>
@@ -149,7 +151,7 @@ export function App() {
 
         <button
           type="button"
-          className="theme-toggle-btn"
+          className="w-10 h-10 rounded-full flex items-center justify-center bg-[var(--bg-surface)] border border-[var(--border-subtle)] text-[var(--text-muted)] hover:text-sky-500 hover:border-sky-300 transition-all shadow-sm cursor-pointer hover:-translate-y-0.5"
           onClick={toggleTheme}
           title={`Switch to ${theme === 'light' ? 'Dark' : 'Light'} Mode`}
           data-testid="theme-toggle-btn"
@@ -158,10 +160,13 @@ export function App() {
         </button>
       </header>
 
-      <main>
-        <section className="hero-section">
-          <h1 className="hero-title">Clear your mind. Master your craft.</h1>
-          <p className="hero-subtitle">
+      <main className="flex-1">
+        {/* Hero Section */}
+        <section className="text-center my-6 max-w-xl mx-auto">
+          <h1 className="hero-title text-3xl sm:text-4xl font-extrabold tracking-tight text-[var(--text-main)] mb-2">
+            Clear your mind. Master your craft.
+          </h1>
+          <p className="text-base text-[var(--text-muted)] leading-relaxed">
             Rapidly capture definitions, code comparisons, and architecture notes with instant real-time sync.
           </p>
         </section>
@@ -173,7 +178,7 @@ export function App() {
         />
 
         {/* Study & Filtering Section */}
-        <section className="study-section">
+        <section className="max-w-4xl w-full mx-auto mt-6">
           <TagFilters
             tags={allTags}
             activeTags={activeTags}
@@ -184,7 +189,7 @@ export function App() {
             totalNotes={filteredNotes.length}
           />
 
-          <div className="notes-grid" data-testid="notes-grid">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-5 mt-6" data-testid="notes-grid">
             {filteredNotes.length > 0 ? (
               filteredNotes.map((note) => (
                 <NoteCard
@@ -195,10 +200,10 @@ export function App() {
                 />
               ))
             ) : (
-              <div className="empty-state">
-                <BookOpen className="empty-state-icon" />
-                <h3>No notes found</h3>
-                <p style={{ marginTop: '0.4rem', fontSize: '0.9rem' }}>
+              <div className="col-span-full text-center py-16 text-[var(--text-muted)]">
+                <BookOpen className="w-12 h-12 text-sky-400 mx-auto mb-3" />
+                <h3 className="font-semibold text-lg text-[var(--text-main)]">No notes found</h3>
+                <p className="mt-1 text-sm text-[var(--text-muted)]">
                   {activeTags.length > 0 || search
                     ? 'Try clearing your active tag filters or search keyword.'
                     : 'Start by capturing your first definition or concept in the bar above!'}
@@ -209,7 +214,7 @@ export function App() {
         </section>
       </main>
 
-      {/* Floating In-App Developer Performance HUD */}
+      {/* Floating Developer Performance HUD */}
       <PerformanceHud />
     </div>
   );
