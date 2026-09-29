@@ -1,0 +1,70 @@
+name: Studify CI
+
+on:
+  push:
+    branches: ["**"]
+  pull_request:
+    branches: ["**"]
+
+jobs:
+  backend-checks:
+    name: Backend Lint, Test & Build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 12
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Install backend dependencies
+        run: pnpm --dir studify-server install
+
+      - name: Run backend unit tests
+        run: pnpm --dir studify-server test
+
+      - name: Build backend
+        run: pnpm --dir studify-server build
+
+  frontend-checks:
+    name: Frontend Lint, Test & Build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 12
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Install frontend dependencies
+        run: pnpm --dir studify-client install
+
+      - name: Run frontend unit tests
+        run: pnpm --dir studify-client test
+
+      - name: Build frontend
+        run: pnpm --dir studify-client build
+
+  docker-compose-validation:
+    name: Validate Docker Compose Configuration
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Validate docker-compose file syntax
+        run: docker compose config

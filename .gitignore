@@ -1,0 +1,27 @@
+# Dependencies
+node_modules/
+.pnpm-store/
+
+# Environment files
+.env
+.env.local
+
+# Build artifacts
+dist/
+build/
+.output/
+
+# Cache & Temp
+.cache/
+.temp/
+*.log
+.DS_Store
+Thumbs.db
+
+# Test coverage & Playwright reports
+coverage/
+playwright-report/
+test-results/
+
+# Docker volumes
+postgres_data/
